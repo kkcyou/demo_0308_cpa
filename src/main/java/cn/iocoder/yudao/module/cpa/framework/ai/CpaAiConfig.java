@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestClient;
 
 /**
  * 多模型AI配置
@@ -140,9 +142,17 @@ public class CpaAiConfig {
         log.info("API地址: {}", baseUrl);
         log.info("=======================");
 
+        // 设置HTTP超时: 连接10秒，读取120秒（AI生成内容较慢）
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(10_000);
+        requestFactory.setReadTimeout(120_000);
+        RestClient.Builder restClientBuilder = RestClient.builder()
+                .requestFactory(requestFactory);
+
         OpenAiApi api = OpenAiApi.builder()
                 .apiKey(apiKey)
                 .baseUrl(baseUrl)
+                .restClientBuilder(restClientBuilder)
                 .build();
 
         OpenAiChatOptions options = OpenAiChatOptions.builder()

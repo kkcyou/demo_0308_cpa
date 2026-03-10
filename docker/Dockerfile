@@ -33,7 +33,11 @@ RUN mkdir -p /data/cpa-archive
 
 EXPOSE 8080
 
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
 ENTRYPOINT ["java", \
     "-Xms512m", "-Xmx1024m", \
+    "-Dfile.encoding=UTF-8", \
     "-Djava.security.egd=file:/dev/./urandom", \
     "-jar", "app.jar"]
