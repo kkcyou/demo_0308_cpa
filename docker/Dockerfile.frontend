@@ -1,0 +1,24 @@
+# ====== 阶段1: 构建前端 ======
+FROM node:20-alpine AS builder
+
+WORKDIR /build
+COPY frontend/package.json .
+RUN npm install --legacy-peer-deps --registry=https://registry.npmmirror.com
+
+COPY frontend/ .
+RUN npm run build
+
+# ====== 阶段2: Nginx服务 ======
+FROM nginx:alpine
+
+# 时区
+RUN apk add --no-cache tzdata \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+# 拷贝构建产物
+COPY --from=builder /build/dist /usr/share/nginx/html
+
+# Nginx配置
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80

@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  # ====== MySQL 数据库 ======
+  mysql:
+    image: mysql:8.0
+    container_name: cpa-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-cpa@2026}
+      MYSQL_DATABASE: yudao_cpa
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../sql/cpa_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./init-data.sql:/docker-entrypoint-initdb.d/02-data.sql
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
+      --max-connections=200
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ====== Redis 缓存 ======
+  redis:
+    image: redis:7-alpine
+    container_name: cpa-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ====== 后端 Spring Boot ======
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: cpa-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      # 数据库（指向docker内部mysql容器）
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/yudao_cpa?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-cpa@2026}
+      SPRING_DATA_REDIS_HOST: redis
+      # AI模型配置（在.env文件中设置）
+      CPA_AI_ACTIVE_MODEL: ${CPA_AI_MODEL:-qwen}
+      AI_OPENAI_API_KEY: ${AI_OPENAI_API_KEY:-}
+      AI_CLAUDE_API_KEY: ${AI_CLAUDE_API_KEY:-}
+      AI_QWEN_API_KEY: ${AI_QWEN_API_KEY:-}
+      AI_DEEPSEEK_API_KEY: ${AI_DEEPSEEK_API_KEY:-}
+      AI_ZHIPU_API_KEY: ${AI_ZHIPU_API_KEY:-}
+      AI_DOUBAO_API_KEY: ${AI_DOUBAO_API_KEY:-}
+      # 存档路径
+      CPA_ARCHIVE_PATH: /data/cpa-archive
+    volumes:
+      - archive_data:/data/cpa-archive
+      - backend_logs:/app/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ====== 前端 Nginx ======
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    container_name: cpa-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  archive_data:
+    driver: local
+  backend_logs:
+    driver: local
