@@ -51,7 +51,7 @@ public class CpaAiConfig {
     // ====== 通义千问 ======
     @Value("${cpa.ai.qwen.api-key:}")
     private String qwenApiKey;
-    @Value("${cpa.ai.qwen.base-url:https://dashscope.aliyuncs.com/compatible-mode/v1}")
+    @Value("${cpa.ai.qwen.base-url:https://dashscope.aliyuncs.com/compatible-mode}")
     private String qwenBaseUrl;
     @Value("${cpa.ai.qwen.model:qwen-plus}")
     private String qwenModel;
@@ -67,7 +67,7 @@ public class CpaAiConfig {
     // ====== 智谱GLM ======
     @Value("${cpa.ai.zhipu.api-key:}")
     private String zhipuApiKey;
-    @Value("${cpa.ai.zhipu.base-url:https://open.bigmodel.cn/api/paas/v4}")
+    @Value("${cpa.ai.zhipu.base-url:https://open.bigmodel.cn/api/paas}")
     private String zhipuBaseUrl;
     @Value("${cpa.ai.zhipu.model:glm-4-plus}")
     private String zhipuModel;
@@ -75,7 +75,7 @@ public class CpaAiConfig {
     // ====== 豆包 ======
     @Value("${cpa.ai.doubao.api-key:}")
     private String doubaoApiKey;
-    @Value("${cpa.ai.doubao.base-url:https://ark.cn-beijing.volces.com/api/v3}")
+    @Value("${cpa.ai.doubao.base-url:https://ark.cn-beijing.volces.com/api}")
     private String doubaoBaseUrl;
     @Value("${cpa.ai.doubao.model:doubao-pro-32k}")
     private String doubaoModel;
