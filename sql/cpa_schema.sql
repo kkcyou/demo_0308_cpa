@@ -1,8 +1,10 @@
 -- =============================================
 -- CICPA 注册会计师每日学习助手 - 数据库建表脚本(第一版)
 -- =============================================
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
 
-CREATE DATABASE IF NOT EXISTS yudao_cpa DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS yudao_cpa DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE yudao_cpa;
 
 -- 1. 考点知识库表

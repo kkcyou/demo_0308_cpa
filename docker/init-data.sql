@@ -1,4 +1,6 @@
 -- CPA Daily 初始考点和真题数据
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
 USE yudao_cpa;
 
 -- 考点数据（六科各若干核心考点）
